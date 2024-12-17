@@ -1,14 +1,37 @@
-# Project
+# Introduction 
+This repository contains our prototype to enable the open source [PyRIT](https://github.com/Azure/PyRIT) toolkit to be used as an API for integrating into other tooling. We welcome suggestions and feedback, and we intend to keep this repository updated. However, at this point this is a prototype and passion project for our team and have no roadmap or funding to maintain this as an actual product.
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+The repository currently contains:
+- /pyritship : A Python Flax Server with some basic features of PyRIT exposed over API (prompt generator and scoring)
+- /burp_extension : A Java extension for BURP Suite to use PyRIT from the **Intruder** module
 
-As the maintainer of this project, please make a few updates:
+![Cartoon image of pirate raccoons on a pirate ship](./docs/images/pyrit_ship.png)
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+# Blue Hat 2024 Talk
+We gave [a talk at Blue Hat 2024 about PyRIT Ship](https://www.youtube.com/watch?v=wna5aIVfucI), talking about the Microsoft AI Red Team and why we made PyRIT Ship and what our hopes and dreams are. If you want to skip straight to the demo, [you can use this link](https://youtu.be/wna5aIVfucI?t=1061).
+
+# Getting Started - Setup & Build code
+[PyRIT Ship Setup & Documentation](/docs/pyritship.md) \
+[BURP Suite Extension Setup & Documentation](/docs/burp_extension.md)
+
+# Demo running BURP Suite extension
+[Attack Gandalf with PyRIT Ship](/docs/burp_gandalf_demo.md)
+
+# TODO
+We have code close to ready to support:
+- Running PyRIT Ship in a Docker container so no local Python setup is required
+- Using Entra ID auth for Azure OpenAI (PyRIT supports this, but PyRIT Ship only uses API key at the moment)
+- Using other endpoints besides Azure OpenAI (PyRIT supports this, we just need to add this to PyRIT Ship)
+- Prompt generation conversation history
+
+Work-in-progress:
+- Browser extension (Chrome/Edge)
+- Supporting converters in BURP Suite
+
+Wishlist:
+- More PyRIT features in the API
+- [Playwright](https://playwright.dev/) integration to support test automation using PyRIT Ship / PyRIT
+
 
 ## Contributing
 
