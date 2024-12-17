@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'com.microsoft.airt.pyritship'
+version '0.0.1'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.portswigger.burp.extensions:montoya-api:2024.7'
+    implementation 'org.json:json:20240303'
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
