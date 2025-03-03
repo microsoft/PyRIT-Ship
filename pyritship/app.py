@@ -56,6 +56,7 @@ def generate_prompt():
     global aoai_chat_target
     if (aoai_chat_target is None):
         aoai_chat_target = initialize_aoai_chat_target()
+    
     promptSendingOrchestrator = PromptSendingOrchestrator(objective_target=aoai_chat_target)
     # Extract input data from json payload
     data = request.get_json()
@@ -96,6 +97,8 @@ def score():
     )
     
 def initialize_aoai_chat_target():
+    initialize_pyrit(memory_db_type=IN_MEMORY)
+
     aoai_chat_target = OpenAIChatTarget(
         deployment_name=os.environ.get("AZURE_OPENAI_GPT4O_CHAT_DEPLOYMENT"),
         endpoint=os.environ.get("AZURE_OPENAI_GPT4O_CHAT_ENDPOINT"),
@@ -106,5 +109,4 @@ def initialize_aoai_chat_target():
 if __name__ == '__main__':
     if os.environ.get("AZURE_OPENAI_GPT4O_CHAT_ENDPOINT") is None:
         load_dotenv()
-    initialize_pyrit(memory_db_type=IN_MEMORY)
-    app.run(host='127.0.0.1', port=5001, debug=True)
+    app.run(host='127.0.0.1', port=5001, debug=True, threaded=False)
