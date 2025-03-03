@@ -4,7 +4,7 @@ import asyncio
 import os
 import inspect
 import importlib
-from pyrit.common import default_values
+from pyrit.common import default_values, initialize_pyrit, IN_MEMORY
 from pyrit.prompt_converter import PromptConverter
 from pyrit.prompt_target import OpenAIChatTarget
 from pyrit.orchestrator import PromptSendingOrchestrator
@@ -56,7 +56,7 @@ def generate_prompt():
     global aoai_chat_target
     if (aoai_chat_target is None):
         aoai_chat_target = initialize_aoai_chat_target()
-    promptSendingOrchestrator = PromptSendingOrchestrator(prompt_target=aoai_chat_target)
+    promptSendingOrchestrator = PromptSendingOrchestrator(objective_target=aoai_chat_target)
     # Extract input data from json payload
     data = request.get_json()
     prompt_goal = data['prompt_goal']
@@ -106,4 +106,5 @@ def initialize_aoai_chat_target():
 if __name__ == '__main__':
     if os.environ.get("AZURE_OPENAI_GPT4O_CHAT_ENDPOINT") is None:
         load_dotenv()
+    initialize_pyrit(memory_db_type=IN_MEMORY)
     app.run(host='127.0.0.1', port=5001, debug=True)
