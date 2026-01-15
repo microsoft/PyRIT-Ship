@@ -4,10 +4,11 @@ import asyncio
 import os
 import inspect
 import importlib
-from pyrit.common import default_values, initialize_pyrit, IN_MEMORY
+from pyrit.common import default_values
+from pyrit.setup import initialize_pyrit_async, IN_MEMORY
 from pyrit.prompt_converter import PromptConverter
 from pyrit.prompt_target import OpenAIChatTarget
-from pyrit.orchestrator import PromptSendingOrchestrator
+from pyrit.executor.attack import PromptSendingAttack, MarkdownAttackResultPrinter
 from pyrit.score import SelfAskTrueFalseScorer
 from dotenv import load_dotenv
 
@@ -52,22 +53,23 @@ def convert(converter_name:str):
 
 @app.route('/prompt/generate', methods=['POST'])
 def generate_prompt():
-    # Initialize AOAI GPT-4o target
+    # Initialize chat target
     global chat_target
     if (chat_target is None):
         chat_target = initialize_chat_target()
     
-    promptSendingOrchestrator = PromptSendingOrchestrator(objective_target=chat_target)
+    prompt_sending_attack = PromptSendingAttack(objective_target=chat_target)
     # Extract input data from json payload
     data = request.get_json()
     prompt_goal = data['prompt_goal']
 
-    generated_prompt = asyncio.run(promptSendingOrchestrator.send_prompts_async(prompt_list=[prompt_goal]))[0].request_pieces[0].converted_value
-    return jsonify({"prompt": generated_prompt})
+    result = asyncio.run(prompt_sending_attack.execute_async(objective=prompt_goal)).last_response.converted_value
+
+    return jsonify({"prompt": result})
 
 @app.route('/prompt/score/SelfAskTrueFalseScorer', methods=['POST'])
 def score():
-    # Initialize AOAI GPT-4o target
+    # Initialize chat target
     global chat_target
     if (chat_target is None):
         chat_target = initialize_chat_target()
@@ -97,7 +99,7 @@ def score():
     )
     
 def initialize_chat_target():
-    initialize_pyrit(memory_db_type=IN_MEMORY)
+    asyncio.run(initialize_pyrit_async(memory_db_type=IN_MEMORY))
 
     chat_target = OpenAIChatTarget(
         model_name=os.environ.get("OPENAI_CHAT_MODEL_NAME"),
