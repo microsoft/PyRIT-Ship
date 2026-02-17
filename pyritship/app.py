@@ -12,7 +12,7 @@ from pyrit.score import SelfAskTrueFalseScorer
 from dotenv import load_dotenv
 
 app = Flask(__name__)
-aoai_chat_target = None
+chat_target = None
 
 @app.route('/prompt/convert')
 def list_converters():
@@ -53,11 +53,11 @@ def convert(converter_name:str):
 @app.route('/prompt/generate', methods=['POST'])
 def generate_prompt():
     # Initialize AOAI GPT-4o target
-    global aoai_chat_target
-    if (aoai_chat_target is None):
-        aoai_chat_target = initialize_aoai_chat_target()
+    global chat_target
+    if (chat_target is None):
+        chat_target = initialize_chat_target()
     
-    promptSendingOrchestrator = PromptSendingOrchestrator(objective_target=aoai_chat_target)
+    promptSendingOrchestrator = PromptSendingOrchestrator(objective_target=chat_target)
     # Extract input data from json payload
     data = request.get_json()
     prompt_goal = data['prompt_goal']
@@ -68,9 +68,9 @@ def generate_prompt():
 @app.route('/prompt/score/SelfAskTrueFalseScorer', methods=['POST'])
 def score():
     # Initialize AOAI GPT-4o target
-    global aoai_chat_target
-    if (aoai_chat_target is None):
-        aoai_chat_target = initialize_aoai_chat_target()
+    global chat_target
+    if (chat_target is None):
+        chat_target = initialize_chat_target()
 
     # Extract input data from json payload
     score_json = request.get_json()
@@ -79,7 +79,7 @@ def score():
     prompt_response_to_score = score_json["prompt_response"]
 
     scorer = SelfAskTrueFalseScorer(
-        chat_target = aoai_chat_target,
+        chat_target = chat_target,
         true_false_question={ 
             "category": "pyritship", 
             "true_description": true_description, 
@@ -96,17 +96,17 @@ def score():
          }
     )
     
-def initialize_aoai_chat_target():
+def initialize_chat_target():
     initialize_pyrit(memory_db_type=IN_MEMORY)
 
-    aoai_chat_target = OpenAIChatTarget(
-        deployment_name=os.environ.get("AZURE_OPENAI_GPT4O_CHAT_DEPLOYMENT"),
-        endpoint=os.environ.get("AZURE_OPENAI_GPT4O_CHAT_ENDPOINT"),
-        api_key=os.environ.get("AZURE_OPENAI_GPT4O_CHAT_KEY")
+    chat_target = OpenAIChatTarget(
+        model_name=os.environ.get("OPENAI_CHAT_MODEL_NAME"),
+        endpoint=os.environ.get("OPENAI_CHAT_ENDPOINT"),
+        api_key=os.environ.get("OPENAI_CHAT_KEY")
     )
-    return aoai_chat_target
+    return chat_target
 
 if __name__ == '__main__':
-    if os.environ.get("AZURE_OPENAI_GPT4O_CHAT_ENDPOINT") is None:
+    if os.environ.get("OPENAI_CHAT_ENDPOINT") is None:
         load_dotenv()
     app.run(host='127.0.0.1', port=5001, debug=True, threaded=False)
