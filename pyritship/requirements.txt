@@ -1,0 +1,14 @@
+# PyRIT Ship Python Dependencies
+# Based on imports found in pyritship/app.py
+
+# Core PyRIT functionality
+pyrit
+
+# Web framework
+flask
+
+# Environment variable management
+python-dotenv
+
+# Optional: Development tools
+requests  # Used in request_tester.py

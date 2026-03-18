@@ -11,6 +11,7 @@ from pyrit.prompt_target import OpenAIChatTarget
 from pyrit.executor.attack import PromptSendingAttack, MarkdownAttackResultPrinter
 from pyrit.score import SelfAskTrueFalseScorer
 from dotenv import load_dotenv
+from azure.identity import InteractiveBrowserCredential, get_bearer_token_provider
 
 app = Flask(__name__)
 chat_target = None
@@ -100,15 +101,32 @@ def score():
     
 def initialize_chat_target():
     asyncio.run(initialize_pyrit_async(memory_db_type=IN_MEMORY))
+    
+    endpoint = os.environ.get("OPENAI_CHAT_ENDPOINT", "")
+    api_key = os.environ.get("OPENAI_CHAT_KEY", "")
+
+    # Support interactive browser creds for Azure OpenAI if no API key is provided
+    if not api_key and "azure.com/" in endpoint:
+        token_provider = get_bearer_token_provider(
+            InteractiveBrowserCredential(),
+            "https://cognitiveservices.azure.com/.default",
+        )
+        api_key = token_provider
 
     chat_target = OpenAIChatTarget(
         model_name=os.environ.get("OPENAI_CHAT_MODEL_NAME"),
-        endpoint=os.environ.get("OPENAI_CHAT_ENDPOINT"),
-        api_key=os.environ.get("OPENAI_CHAT_KEY")
+        endpoint=endpoint,
+        api_key=api_key,
     )
+
     return chat_target
 
 if __name__ == '__main__':
     if os.environ.get("OPENAI_CHAT_ENDPOINT") is None:
         load_dotenv()
-    app.run(host='127.0.0.1', port=5001, debug=True, threaded=False)
+    app.run(
+        host=os.environ.get("FLASK_HOST", "127.0.0.1"),
+        port=int(os.environ.get("FLASK_PORT", 5001)),
+        debug=os.environ.get("FLASK_DEBUG", "false").lower() == "true",
+        threaded=False,
+    )

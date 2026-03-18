@@ -142,6 +142,7 @@ celerybeat.pid
 # Environments
 .env
 .env.*
+!.env.example
 .venv
 env/
 venv/
@@ -199,3 +200,6 @@ doc/_autosummary/
 
 # Ignore DS_STORE files
 **/.DS_Store
+
+# Ignore Dev Container
+.devcontainer/
