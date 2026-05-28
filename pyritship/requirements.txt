@@ -12,5 +12,4 @@ mcp
 # Environment variable management
 python-dotenv
 
-# Optional: Development tools
-requests  # Used in request_tester.py
+requests
