@@ -11,7 +11,7 @@ from typing import Optional, Any
 from concurrent.futures import Future
 
 from pyrit.setup import initialize_pyrit_async, IN_MEMORY
-from pyrit.prompt_converter import PromptConverter
+from pyrit.converter import Converter
 from pyrit.prompt_target import OpenAIChatTarget
 from pyrit.executor.attack import (
     PromptSendingAttack, RTASystemPromptPaths,
@@ -147,7 +147,7 @@ class PyRITShipService:
 
     def list_converters(self) -> list[str]:
         """Return a list of converter class names that can be instantiated without arguments."""
-        converters = PromptConverter.__subclasses__()
+        converters = Converter.__subclasses__()
         converter_list = []
         for converter in converters:
             params = inspect.signature(converter.__init__).parameters
@@ -162,7 +162,7 @@ class PyRITShipService:
 
     def convert_text(self, converter_name: str, text: str) -> str:
         """Convert text using the named converter. Returns the converted text."""
-        c = next((cls for cls in PromptConverter.__subclasses__() if cls.__name__ == converter_name), None)
+        c = next((cls for cls in Converter.__subclasses__() if cls.__name__ == converter_name), None)
         if c is None:
             raise ValueError(f"Unknown converter: {converter_name}")
 
